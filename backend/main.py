@@ -24,7 +24,7 @@ try:
 except LookupError:
     nltk.download("stopwords", quiet=True)
 
-app = FastAPI(title="AutoU Email Classifier", version="2.0.0")
+app = FastAPI(title="Email Classifier", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -170,7 +170,7 @@ class GmailRequest(BaseModel):
 
 @app.get("/")
 def root():
-    return {"status": "AutoU Email Classifier API", "version": "2.0.0"}
+    return {"status": "Email Classifier API", "version": "2.0.0"}
 
 @app.get("/health")
 def health():

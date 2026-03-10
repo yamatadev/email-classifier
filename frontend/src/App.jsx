@@ -4,6 +4,8 @@ import MainApp from './components/MainApp'
 
 export default function App() {
   const [user, setUser] = useState(null)
-  if (!user) return <LoginPage onLogin={setUser} />
-  return <MainApp user={user} onLogout={() => setUser(null)} />
+  const [lang, setLang] = useState('pt-BR')
+
+  if (!user) return <LoginPage onLogin={setUser} lang={lang} setLang={setLang} />
+  return <MainApp user={user} onLogout={() => setUser(null)} lang={lang} setLang={setLang} />
 }

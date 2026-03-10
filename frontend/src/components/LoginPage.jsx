@@ -1,30 +1,92 @@
 import { useState, useEffect } from 'react'
-import { Zap, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Zap, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle, Globe } from 'lucide-react'
+import { translations } from '../i18n'
 
 const DEMO_USERS = [
   { email: 'demo@autou.com.br', password: 'autou2025', name: 'Demo User', role: 'Analista Financeiro' },
   { email: 'admin@autou.com.br', password: 'admin123', name: 'Admin', role: 'Gestor de Operações' },
 ]
 
-const STATS = [
-  { value: '150k+', label: 'Pessoas impactadas' },
-  { value: 'US$10M+', label: 'Em ganhos gerados' },
-  { value: '15+', label: 'Países atendidos' },
-]
+// ─── Language Toggle ──────────────────────────────────────────────────────
 
-const FEATURES = [
-  'Classificação inteligente em tempo real',
-  'Sugestão automática de respostas',
-  'Pipeline NLP com RSLP para português',
-  'Histórico e métricas por sessão',
-]
+function LangToggle({ lang, setLang }) {
+  const isPT = lang === 'pt-BR'
+  const t = translations[lang].login
+
+  return (
+    <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 10 }}>
+      <button
+        onClick={() => setLang(isPT ? 'en-US' : 'pt-BR')}
+        title={t.langHint}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '10px',
+          padding: '10px 16px',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '100px',
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'var(--accent-blue)'
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(59,130,246,0.2)'
+          e.currentTarget.style.transform = 'translateY(-1px)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'var(--border-default)'
+          e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.3)'
+          e.currentTarget.style.transform = 'translateY(0)'
+        }}
+      >
+        <Globe size={14} color="var(--accent-blue)" strokeWidth={2} />
+
+        {/* Current lang pill */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '16px', lineHeight: 1 }}>{isPT ? '🇧🇷' : '🇺🇸'}</span>
+          <span style={{
+            fontSize: '11px', fontWeight: '700', fontFamily: 'var(--font-mono)',
+            color: 'var(--text-primary)', letterSpacing: '0.06em',
+          }}>
+            {isPT ? 'PT-BR' : 'EN-US'}
+          </span>
+        </div>
+
+        {/* Divider */}
+        <div style={{ width: '1px', height: '14px', background: 'var(--border-subtle)' }} />
+
+        {/* Switch to label */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '16px', lineHeight: 1 }}>{isPT ? '🇺🇸' : '🇧🇷'}</span>
+          <span style={{
+            fontSize: '11px', fontWeight: '500', fontFamily: 'var(--font-mono)',
+            color: 'var(--text-muted)', letterSpacing: '0.04em',
+          }}>
+            {isPT ? 'EN-US' : 'PT-BR'}
+          </span>
+        </div>
+
+        {/* Arrow indicator */}
+        <ArrowRight size={11} color="var(--text-muted)" strokeWidth={2.5} />
+      </button>
+
+      {/* Hint label below button */}
+      <div style={{
+        textAlign: 'center', marginTop: '6px',
+        fontSize: '10px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)',
+        letterSpacing: '0.04em',
+      }}>
+        {t.langHint}
+      </div>
+    </div>
+  )
+}
 
 // ─── Animated Background ──────────────────────────────────────────────────
 
 function AnimatedBackground() {
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-      {/* Grid */}
       <div style={{
         position: 'absolute', inset: 0,
         backgroundImage: `
@@ -35,25 +97,19 @@ function AnimatedBackground() {
         animation: 'grid-move 8s linear infinite',
         maskImage: 'linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)',
       }} />
-
-      {/* Orbs */}
       {[
         { w: 400, h: 400, x: '-10%', y: '10%', color: 'rgba(59,130,246,0.12)', delay: '0s', dur: '12s' },
         { w: 300, h: 300, x: '60%', y: '50%', color: 'rgba(6,182,212,0.08)', delay: '-4s', dur: '15s' },
         { w: 250, h: 250, x: '30%', y: '-5%', color: 'rgba(99,102,241,0.10)', delay: '-8s', dur: '10s' },
       ].map((o, i) => (
         <div key={i} style={{
-          position: 'absolute',
-          width: o.w, height: o.h,
-          left: o.x, top: o.y,
+          position: 'absolute', width: o.w, height: o.h, left: o.x, top: o.y,
           borderRadius: '50%',
           background: `radial-gradient(circle, ${o.color} 0%, transparent 70%)`,
           filter: 'blur(40px)',
           animation: `float-orb ${o.dur} ease-in-out ${o.delay} infinite`,
         }} />
       ))}
-
-      {/* Bottom gradient */}
       <div style={{
         position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
         background: 'linear-gradient(to top, var(--bg-void), transparent)',
@@ -64,9 +120,10 @@ function AnimatedBackground() {
 
 // ─── Left Branding Panel ──────────────────────────────────────────────────
 
-function BrandPanel() {
+function BrandPanel({ lang }) {
   const [visible, setVisible] = useState(false)
   useEffect(() => { setTimeout(() => setVisible(true), 100) }, [])
+  const t = translations[lang].login
 
   return (
     <div style={{
@@ -76,7 +133,6 @@ function BrandPanel() {
       overflow: 'hidden',
     }}>
       <AnimatedBackground />
-
       <div style={{ position: 'relative', zIndex: 1 }}>
         {/* Logo */}
         <div className="logo-reveal" style={{
@@ -96,7 +152,7 @@ function BrandPanel() {
               MailSense
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              by AutoU
+              {t.tagline}
             </div>
           </div>
         </div>
@@ -108,26 +164,24 @@ function BrandPanel() {
             lineHeight: 1.1, letterSpacing: '-0.03em',
             color: 'var(--text-primary)', marginBottom: '16px',
           }}>
-            Triagem de emails{' '}
+            {t.headline1}{' '}
             <span style={{
               background: 'linear-gradient(90deg, #3B82F6, #06B6D4, #3B82F6)',
               backgroundSize: '200% auto',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              animation: 'shimmer 3s linear infinite',
+              WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text', animation: 'shimmer 3s linear infinite',
             }}>
-              inteligente
+              {t.headline2}
             </span>
           </h1>
           <p style={{ fontSize: '16px', color: 'var(--text-secondary)', lineHeight: '1.65', maxWidth: '380px' }}>
-            Classifique, priorize e responda emails corporativos automaticamente com inteligência artificial.
+            {t.description}
           </p>
         </div>
 
         {/* Features */}
         <div style={{ marginBottom: '48px', opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease 0.35s' }}>
-          {FEATURES.map((f, i) => (
+          {t.features.map((f, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
               <div style={{
                 width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
@@ -144,14 +198,13 @@ function BrandPanel() {
         {/* Stats */}
         <div style={{
           display: 'flex', gap: '0',
-          borderTop: '1px solid var(--border-subtle)',
-          paddingTop: '32px',
+          borderTop: '1px solid var(--border-subtle)', paddingTop: '32px',
           opacity: visible ? 1 : 0, transition: 'opacity 0.6s ease 0.5s',
         }}>
-          {STATS.map((s, i) => (
+          {t.stats.map((s, i) => (
             <div key={i} style={{
               flex: 1, paddingRight: '24px',
-              borderRight: i < STATS.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+              borderRight: i < t.stats.length - 1 ? '1px solid var(--border-subtle)' : 'none',
               paddingLeft: i > 0 ? '24px' : '0',
             }}>
               <div style={{ fontSize: '24px', fontWeight: '800', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '3px' }}>
@@ -170,7 +223,7 @@ function BrandPanel() {
 
 // ─── Login Form ───────────────────────────────────────────────────────────
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({ onLogin, lang, setLang }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -178,21 +231,18 @@ export default function LoginPage({ onLogin }) {
   const [loading, setLoading] = useState(false)
   const [focusedField, setFocusedField] = useState(null)
 
+  const t = translations[lang].login
+
+  // Clear error when switching language
+  useEffect(() => { setError('') }, [lang])
+
   const handleSubmit = async () => {
-    if (!email || !password) { setError('Preencha todos os campos.'); return }
-    setLoading(true)
-    setError('')
-
-    // Simulate async auth
+    if (!email || !password) { setError(t.errorEmpty); return }
+    setLoading(true); setError('')
     await new Promise(r => setTimeout(r, 900))
-
     const user = DEMO_USERS.find(u => u.email === email && u.password === password)
-    if (user) {
-      onLogin(user)
-    } else {
-      setError('Email ou senha incorretos. Tente: demo@autou.com.br / autou2025')
-      setLoading(false)
-    }
+    if (user) { onLogin({ ...user, lang }) }
+    else { setError(t.errorInvalid); setLoading(false) }
   }
 
   const handleKeyDown = e => { if (e.key === 'Enter') handleSubmit() }
@@ -209,25 +259,28 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-void)' }}>
-      {/* Left */}
-      <BrandPanel />
+      <BrandPanel lang={lang} />
 
       {/* Right: Form */}
       <div style={{
-        width: '480px', flexShrink: 0,
+        width: '480px', flexShrink: 0, position: 'relative',
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         padding: '60px 48px',
         background: 'var(--bg-base)',
         borderLeft: '1px solid var(--border-subtle)',
       }}>
+
+        {/* Language Toggle — prominent, top right */}
+        <LangToggle lang={lang} setLang={setLang} />
+
         <div className="auth-enter">
           {/* Header */}
-          <div style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '40px', marginTop: '40px' }}>
             <h2 style={{ fontSize: '26px', fontWeight: '700', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', marginBottom: '8px', letterSpacing: '-0.02em' }}>
-              Bem-vindo de volta
+              {t.welcomeBack}
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', fontFamily: 'var(--font-body)' }}>
-              Acesse sua conta para continuar
+              {t.accessAccount}
             </p>
           </div>
 
@@ -238,50 +291,40 @@ export default function LoginPage({ onLogin }) {
             marginBottom: '28px',
           }}>
             <div style={{ fontSize: '11px', color: 'var(--accent-blue)', fontFamily: 'var(--font-mono)', marginBottom: '4px', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              Acesso demo
+              {t.demoAccess}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-              demo@autou.com.br <span style={{ color: 'var(--text-muted)' }}>·</span> autou2025
+              {t.demoHint}
             </div>
           </div>
 
           {/* Fields */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
-            {/* Email */}
             <div>
               <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', letterSpacing: '0.05em' }}>
-                EMAIL
+                {t.emailLabel}
               </label>
               <div style={{ position: 'relative' }}>
                 <Mail size={15} color={focusedField === 'email' ? 'var(--accent-blue)' : 'var(--text-muted)'}
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', transition: 'color 0.2s ease' }} />
-                <input
-                  type="email" value={email} placeholder="seu@email.com.br"
+                <input type="email" value={email} placeholder={t.emailPlaceholder}
                   onChange={e => setEmail(e.target.value)}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField(null)}
-                  onKeyDown={handleKeyDown}
-                  style={inputStyle('email')}
-                />
+                  onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
+                  onKeyDown={handleKeyDown} style={inputStyle('email')} />
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', letterSpacing: '0.05em' }}>
-                SENHA
+                {t.passwordLabel}
               </label>
               <div style={{ position: 'relative' }}>
                 <Lock size={15} color={focusedField === 'pass' ? 'var(--accent-blue)' : 'var(--text-muted)'}
                   style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', transition: 'color 0.2s ease' }} />
-                <input
-                  type={showPass ? 'text' : 'password'} value={password} placeholder="••••••••"
+                <input type={showPass ? 'text' : 'password'} value={password} placeholder={t.passwordPlaceholder}
                   onChange={e => setPassword(e.target.value)}
-                  onFocus={() => setFocusedField('pass')}
-                  onBlur={() => setFocusedField(null)}
-                  onKeyDown={handleKeyDown}
-                  style={{ ...inputStyle('pass'), paddingRight: '44px' }}
-                />
+                  onFocus={() => setFocusedField('pass')} onBlur={() => setFocusedField(null)}
+                  onKeyDown={handleKeyDown} style={{ ...inputStyle('pass'), paddingRight: '44px' }} />
                 <button onClick={() => setShowPass(v => !v)} style={{
                   position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)',
                   background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px',
@@ -305,9 +348,7 @@ export default function LoginPage({ onLogin }) {
           )}
 
           {/* Submit */}
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
+          <button onClick={handleSubmit} disabled={loading}
             style={{
               width: '100%', padding: '14px',
               borderRadius: 'var(--radius-md)', border: 'none',
@@ -319,22 +360,21 @@ export default function LoginPage({ onLogin }) {
               transition: 'all 0.2s ease',
               boxShadow: loading ? 'none' : '0 4px 20px rgba(59,130,246,0.35)',
             }}
-            onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = 'translateY(-1px)'; if (!loading) e.currentTarget.style.boxShadow = '0 8px 28px rgba(59,130,246,0.45)' }}
+            onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(59,130,246,0.45)' } }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; if (!loading) e.currentTarget.style.boxShadow = '0 4px 20px rgba(59,130,246,0.35)' }}
           >
             {loading ? (
               <>
                 <div style={{ width: 16, height: 16, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                Verificando...
+                {t.verifying}
               </>
             ) : (
-              <>Entrar <ArrowRight size={16} /></>
+              <>{t.enter} <ArrowRight size={16} /></>
             )}
           </button>
 
-          {/* Footer */}
           <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', marginTop: '28px' }}>
-            MailSense · AutoU © 2025
+            {t.footer}
           </p>
         </div>
       </div>

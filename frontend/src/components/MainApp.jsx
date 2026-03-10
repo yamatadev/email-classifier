@@ -4,10 +4,43 @@ import {
   AlertCircle, Clock, TrendingUp, TrendingDown,
   Zap, Shield, BarChart3, X, RotateCcw, Info,
   MessageSquare, LogOut, User, Mail, Key,
-  ChevronDown, ChevronUp, Layers, Eye, EyeOff, Trash2
+  ChevronDown, ChevronUp, Layers, Eye, EyeOff, Trash2, Globe, ArrowRight
 } from 'lucide-react'
+import { translations } from '../i18n'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+// ─── Language Toggle (compact, for header) ───────────────────────────────
+
+function LangToggle({ lang, setLang }) {
+  const isPT = lang === 'pt-BR'
+  return (
+    <button
+      onClick={() => setLang(isPT ? 'en-US' : 'pt-BR')}
+      title={isPT ? 'Switch to English' : 'Mudar para Português'}
+      style={{
+        display: 'flex', alignItems: 'center', gap: '7px',
+        padding: '7px 12px',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-default)',
+        borderRadius: '100px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-blue)'; e.currentTarget.style.background = 'rgba(59,130,246,0.08)' }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.background = 'var(--bg-surface)' }}
+    >
+      <Globe size={12} color="var(--accent-blue)" />
+      <span style={{ fontSize: '11px', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--text-primary)', letterSpacing: '0.06em' }}>
+        {isPT ? '🇧🇷 PT' : '🇺🇸 EN'}
+      </span>
+      <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>→</span>
+      <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>
+        {isPT ? '🇺🇸 EN' : '🇧🇷 PT'}
+      </span>
+    </button>
+  )
+}
 
 // ─── Small Utilities ──────────────────────────────────────────────────────
 
@@ -192,7 +225,7 @@ function UploadZone({ onFiles, isDragging, setIsDragging, multiple = false }) {
 
 // ─── Gmail Tab ────────────────────────────────────────────────────────────
 
-function GmailTab({ onResults }) {
+function GmailTab({ onResults, lang }) {
   const [gmailUser, setGmailUser] = useState('')
   const [appPassword, setAppPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -201,8 +234,10 @@ function GmailTab({ onResults }) {
   const [error, setError] = useState('')
   const [showGuide, setShowGuide] = useState(false)
 
+  const tg = translations[lang].gmail
+
   const handleFetch = async () => {
-    if (!gmailUser || !appPassword) { setError('Preencha email e App Password.'); return }
+    if (!gmailUser || !appPassword) { setError(tg.errorEmpty); return }
     setLoading(true); setError('')
     try {
       const resp = await fetch(`${API_BASE}/gmail/fetch-and-analyze`, {
@@ -219,22 +254,14 @@ function GmailTab({ onResults }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {/* How to get App Password */}
       <div style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', overflow: 'hidden' }}>
         <button onClick={() => setShowGuide(v => !v)} style={{ width: '100%', padding: '11px 14px', background: 'var(--bg-elevated)', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>Como obter o App Password do Gmail?</span>
+          <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{tg.guideTitle}</span>
           {showGuide ? <ChevronUp size={13} color="var(--text-muted)" /> : <ChevronDown size={13} color="var(--text-muted)" />}
         </button>
         {showGuide && (
           <div style={{ padding: '14px', background: 'var(--bg-base)', borderTop: '1px solid var(--border-subtle)' }}>
-            {[
-              'Acesse myaccount.google.com → Segurança',
-              'Clique em "Verificação em duas etapas" e ATIVE (obrigatório)',
-              'Após ativar, volte em Segurança e role para baixo',
-              'Clique em "Senhas de app" (só aparece com 2FA ativo)',
-              'Digite um nome como "MailSense" e clique em Criar',
-              'Copie a senha de 16 caracteres gerada',
-            ].map((step, i) => (
+            {tg.guideSteps.map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
                 <span style={{ fontSize: '10px', color: 'var(--accent-blue)', fontFamily: 'var(--font-mono)', minWidth: 16, marginTop: '2px' }}>{i + 1}.</span>
                 <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{step}</span>
@@ -243,8 +270,6 @@ function GmailTab({ onResults }) {
           </div>
         )}
       </div>
-
-      {/* Fields */}
       <div>
         <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '6px', letterSpacing: '0.05em' }}>EMAIL GMAIL</label>
         <div style={{ position: 'relative' }}>
@@ -255,10 +280,10 @@ function GmailTab({ onResults }) {
       </div>
 
       <div>
-        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '6px', letterSpacing: '0.05em' }}>APP PASSWORD</label>
+        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '6px', letterSpacing: '0.05em' }}>{tg.passwordLabel}</label>
         <div style={{ position: 'relative' }}>
           <Key size={14} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input type={showPass ? 'text' : 'password'} value={appPassword} onChange={e => setAppPassword(e.target.value)} placeholder="xxxx xxxx xxxx xxxx"
+          <input type={showPass ? 'text' : 'password'} value={appPassword} onChange={e => setAppPassword(e.target.value)} placeholder={tg.passwordPlaceholder}
             style={{ ...inputStyle, paddingLeft: '36px', paddingRight: '40px', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em' }} />
           <button onClick={() => setShowPass(v => !v)} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>
             {showPass ? <EyeOff size={14} /> : <Eye size={14} />}
@@ -267,7 +292,7 @@ function GmailTab({ onResults }) {
       </div>
 
       <div>
-        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '6px', letterSpacing: '0.05em' }}>QUANTIDADE DE EMAILS</label>
+        <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '6px', letterSpacing: '0.05em' }}>{tg.quantityLabel}</label>
         <div style={{ display: 'flex', gap: '8px' }}>
           {[5, 10].map(n => (
             <button key={n} onClick={() => setLimit(n)} style={{ flex: 1, padding: '8px', borderRadius: 'var(--radius-sm)', border: `1px solid ${limit === n ? 'var(--accent-blue)' : 'var(--border-default)'}`, background: limit === n ? 'var(--accent-blue-glow)' : 'transparent', color: limit === n ? 'var(--accent-blue)' : 'var(--text-secondary)', fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--font-mono)' }}>
@@ -276,7 +301,7 @@ function GmailTab({ onResults }) {
           ))}
         </div>
         <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '6px', fontFamily: 'var(--font-mono)' }}>
-          Limitado a 10 para controle de créditos da API.
+          {tg.limitHint}
         </p>
       </div>
 
@@ -289,8 +314,8 @@ function GmailTab({ onResults }) {
 
       <button onClick={handleFetch} disabled={loading || !gmailUser || !appPassword} style={{ padding: '11px', borderRadius: 'var(--radius-md)', border: 'none', background: (!loading && gmailUser && appPassword) ? 'var(--accent-blue)' : 'var(--bg-elevated)', color: (!loading && gmailUser && appPassword) ? 'white' : 'var(--text-muted)', fontSize: '14px', fontWeight: '600', cursor: (!loading && gmailUser && appPassword) ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s ease', boxShadow: (!loading && gmailUser && appPassword) ? '0 0 20px rgba(59,130,246,0.3)' : 'none' }}>
         {loading ? (
-          <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />Buscando e analisando...</>
-        ) : <><Mail size={14} /> Buscar e Analisar Gmail</>}
+          <><div style={{ width: 14, height: 14, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />{tg.fetching}</>
+        ) : <><Mail size={14} /> {tg.fetchButton}</>}
       </button>
     </div>
   )
@@ -334,14 +359,8 @@ function HistoryItem({ item, onSelect, onDelete, isActive }) {
 
 // ─── Main App ──────────────────────────────────────────────────────────────
 
-const TABS = [
-  { key: 'text', label: 'Texto', icon: <FileText size={12} /> },
-  { key: 'file', label: 'Arquivo', icon: <Upload size={12} /> },
-  { key: 'batch', label: 'Múltiplos', icon: <Layers size={12} /> },
-  { key: 'gmail', label: 'Gmail', icon: <Mail size={12} /> },
-]
-
-export default function MainApp({ user, onLogout }) {
+export default function MainApp({ user, onLogout, lang, setLang }) {
+  const t = translations[lang]
   const [tab, setTab] = useState('text')
   const [text, setText] = useState('')
   const [files, setFiles] = useState([])
@@ -432,6 +451,13 @@ export default function MainApp({ user, onLogout }) {
   const avgConf = history.filter(h => h.type === 'single').length > 0
     ? Math.round(history.filter(h => h.type === 'single').reduce((a, h) => a + (h.result?.data?.confidence || 0), 0) / history.filter(h => h.type === 'single').length * 100) : 0
 
+  const TABS = [
+    { key: 'text', label: t.tabs.text, icon: <FileText size={12} /> },
+    { key: 'file', label: t.tabs.file, icon: <Upload size={12} /> },
+    { key: 'batch', label: t.tabs.batch, icon: <Layers size={12} /> },
+    { key: 'gmail', label: t.tabs.gmail, icon: <Mail size={12} /> },
+  ]
+
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-void)', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
@@ -442,15 +468,15 @@ export default function MainApp({ user, onLogout }) {
           </div>
           <div>
             <div style={{ fontSize: '14px', fontWeight: '700', fontFamily: 'var(--font-display)', color: 'var(--text-primary)', lineHeight: 1.2 }}>MailSense</div>
-            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>by AutoU</div>
+            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', letterSpacing: '0.08em' }}>{t.header.tagline}</div>
           </div>
         </div>
 
         {totalAnalyzed > 0 && (
           <div style={{ display: 'flex', gap: '20px' }}>
             {[
-              { label: 'Analisados', val: totalAnalyzed, color: 'var(--text-secondary)' },
-              { label: 'Confiança avg', val: `${avgConf}%`, color: 'var(--accent-blue)' },
+              { label: t.header.analyzed, val: totalAnalyzed, color: 'var(--text-secondary)' },
+              { label: t.header.avgConfidence, val: `${avgConf}%`, color: 'var(--accent-blue)' },
             ].map((s, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '15px', fontWeight: '700', color: s.color, fontFamily: 'var(--font-mono)' }}>{s.val}</div>
@@ -461,6 +487,7 @@ export default function MainApp({ user, onLogout }) {
         )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <LangToggle lang={lang} setLang={setLang} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <User size={12} color="var(--text-secondary)" />
@@ -473,7 +500,7 @@ export default function MainApp({ user, onLogout }) {
           <button onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: 'var(--radius-sm)', background: 'none', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer', transition: 'all 0.15s ease' }}
             onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
             onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
-            <LogOut size={12} /> Sair
+            <LogOut size={12} /> {t.header.logout}
           </button>
         </div>
       </header>
@@ -483,10 +510,10 @@ export default function MainApp({ user, onLogout }) {
         <aside style={{ width: 220, flexShrink: 0, borderRight: '1px solid var(--border-subtle)', padding: '16px 10px', display: 'flex', flexDirection: 'column', gap: '6px', overflowY: 'auto' }}>
           <div style={{ padding: '4px 8px 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Clock size={10} color="var(--text-muted)" />
-            <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Histórico</span>
+            <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.history.title}</span>
           </div>
           {history.length === 0
-            ? <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--text-faint)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Nenhuma análise ainda</div>
+            ? <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--text-faint)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{t.history.empty}</div>
             : history.map(item => <HistoryItem key={item.id} item={item} onSelect={handleHistorySelect} onDelete={handleDeleteHistory} isActive={item.id === activeHistoryId} />)
           }
         </aside>
@@ -508,11 +535,11 @@ export default function MainApp({ user, onLogout }) {
               {/* Text tab */}
               {tab === 'text' && (
                 <div>
-                  <textarea value={text} onChange={e => setText(e.target.value)} placeholder="Cole aqui o conteúdo do email para análise..." rows={7}
+                  <textarea value={text} onChange={e => setText(e.target.value)} placeholder={t.input.textPlaceholder} rows={7}
                     style={{ width: '100%', resize: 'vertical', minHeight: '140px', background: 'var(--bg-base)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '14px', color: 'var(--text-primary)', fontSize: '13px', fontFamily: 'var(--font-body)', lineHeight: '1.65', outline: 'none', transition: 'border-color 0.2s ease' }}
                     onFocus={e => e.target.style.borderColor = 'var(--accent-blue)'}
                     onBlur={e => e.target.style.borderColor = 'var(--border-default)'} />
-                  {text && <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'right', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>{text.length} chars</div>}
+                  {text && <div style={{ fontSize: '10px', color: 'var(--text-muted)', textAlign: 'right', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>{text.length} {t.input.chars}</div>}
                 </div>
               )}
 
@@ -562,7 +589,7 @@ export default function MainApp({ user, onLogout }) {
               )}
 
               {/* Gmail tab */}
-              {tab === 'gmail' && <GmailTab onResults={handleGmailResults} />}
+              {tab === 'gmail' && <GmailTab onResults={handleGmailResults} lang={lang} />}
 
               {/* Actions */}
               {tab !== 'gmail' && (
@@ -571,14 +598,14 @@ export default function MainApp({ user, onLogout }) {
                     <button onClick={handleReset} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '7px 12px', borderRadius: 'var(--radius-sm)', background: 'none', border: '1px solid var(--border-default)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer' }}
                       onMouseEnter={e => e.currentTarget.style.color = 'var(--text-primary)'}
                       onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
-                      <RotateCcw size={11} /> Limpar
+                      <RotateCcw size={11} /> {t.input.clear}
                     </button>
                   ) : <div />}
                   <button onClick={tab === 'batch' ? handleBatchSubmit : handleSubmitSingle} disabled={!canSubmit}
                     style={{ display: 'flex', alignItems: 'center', gap: '7px', padding: '9px 20px', borderRadius: 'var(--radius-md)', border: 'none', background: canSubmit ? 'var(--accent-blue)' : 'var(--bg-elevated)', cursor: canSubmit ? 'pointer' : 'not-allowed', color: canSubmit ? 'white' : 'var(--text-muted)', fontSize: '13px', fontWeight: '600', fontFamily: 'var(--font-body)', transition: 'all 0.2s ease', boxShadow: canSubmit ? '0 0 16px rgba(59,130,246,0.3)' : 'none' }}>
                     {loading
-                      ? <><div style={{ width: 13, height: 13, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />Analisando...</>
-                      : <><Send size={13} /> {tab === 'batch' ? `Analisar ${files.length} arquivo(s)` : 'Analisar Email'}</>}
+                      ? <><div style={{ width: 13, height: 13, border: '2px solid rgba(255,255,255,0.3)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />{t.input.analyzing}</>
+                      : <><Send size={13} /> {tab === 'batch' ? `${t.input.analyzeBatch} ${files.length} ${t.input.files}` : t.input.analyze}</>}
                   </button>
                 </div>
               )}
@@ -626,7 +653,7 @@ export default function MainApp({ user, onLogout }) {
               ))}
               {batchResults.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontSize: '13px' }}>
-                  Todos os emails foram removidos.
+                  {t.batch.allRemoved}
                 </div>
               )}
             </div>
@@ -638,8 +665,8 @@ export default function MainApp({ user, onLogout }) {
               <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
                 <BarChart3 size={22} color="var(--text-faint)" />
               </div>
-              <p style={{ fontSize: '14px', marginBottom: '5px', color: 'var(--text-secondary)' }}>Pronto para analisar</p>
-              <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>Texto · Arquivo · Múltiplos arquivos · Gmail</p>
+              <p style={{ fontSize: '14px', marginBottom: '5px', color: 'var(--text-secondary)' }}>{t.emptyState.title}</p>
+              <p style={{ fontSize: '11px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{t.emptyState.subtitle}</p>
             </div>
           )}
         </main>
@@ -649,9 +676,9 @@ export default function MainApp({ user, onLogout }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
               <Info size={10} color="var(--text-muted)" />
-              <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Categorias</span>
+              <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.panel.categories}</span>
             </div>
-            {[{ type: 'PRODUTIVO', color: 'var(--productive)', desc: 'Requer ação ou resposta' }, { type: 'IMPRODUTIVO', color: 'var(--unproductive)', desc: 'Não requer ação imediata' }].map(c => (
+            {[{ type: 'PRODUTIVO', color: 'var(--productive)', desc: t.panel.productiveDesc }, { type: 'IMPRODUTIVO', color: 'var(--unproductive)', desc: t.panel.unproductiveDesc }].map(c => (
               <div key={c.type} style={{ marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
@@ -667,9 +694,9 @@ export default function MainApp({ user, onLogout }) {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
               <Shield size={10} color="var(--text-muted)" />
-              <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Pipeline NLP</span>
+              <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.panel.pipeline}</span>
             </div>
-            {['Tokenização', 'Stopwords (PT+EN)', 'Stemming RSLP', 'Claude AI', 'Resposta gerada'].map((step, i) => (
+            {t.panel.pipelineSteps.map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: '7px', marginBottom: '7px' }}>
                 <span style={{ fontSize: '9px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', marginTop: '2px', minWidth: 12 }}>{String(i + 1).padStart(2, '0')}</span>
                 <span style={{ fontSize: '10px', color: 'var(--text-muted)', lineHeight: '1.5' }}>{step}</span>
@@ -680,10 +707,21 @@ export default function MainApp({ user, onLogout }) {
           <div style={{ height: '1px', background: 'var(--border-subtle)' }} />
 
           <div>
-            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Modos</div>
-            {[['Texto livre', 'var(--text-muted)'], ['Arquivo único', 'var(--text-muted)'], ['Múltiplos (20x)', 'var(--accent-blue)'], ['Gmail (10x)', 'var(--productive)']].map(([t, c], i) => (
-              <div key={i} style={{ fontSize: '10px', color: c, fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
-                <span style={{ color: 'var(--text-faint)' }}>▸ </span>{t}
+            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.panel.modes}</div>
+            {t.panel.modesList.map((m, i) => (
+              <div key={i} style={{ fontSize: '10px', color: i >= 2 ? (i === 2 ? 'var(--accent-blue)' : 'var(--productive)') : 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
+                <span style={{ color: 'var(--text-faint)' }}>▸ </span>{m}
+              </div>
+            ))}
+          </div>
+
+          <div style={{ height: '1px', background: 'var(--border-subtle)' }} />
+
+          <div>
+            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.panel.stack}</div>
+            {['FastAPI · Python', 'Claude claude-opus-4-5', 'NLTK · RSLP', 'React · Vite', 'Gmail IMAP'].map((s, i) => (
+              <div key={i} style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
+                <span style={{ color: 'var(--text-faint)' }}>▸ </span>{s}
               </div>
             ))}
           </div>
