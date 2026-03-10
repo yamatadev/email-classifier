@@ -2,7 +2,7 @@ export const translations = {
   'pt-BR': {
     // Login Page
     login: {
-      tagline: 'by YamatDev · AI Email Classifier',
+      tagline: 'by YamataDev · AI Email Classifier',
       headline1: 'Triagem de emails',
       headline2: 'inteligente',
       description: 'Classifique, priorize e responda emails corporativos automaticamente com inteligência artificial.',
@@ -32,6 +32,10 @@ export const translations = {
       footer: 'MailSense · YamataDev © 2025',
       langButton: '🇺🇸 Switch to English',
       langHint: 'Clique para mudar o idioma',
+      roles: {
+        'financial_analyst': 'Analista Financeiro',
+        'operations_manager': 'Gestor de Operações',
+      },
     },
 
     // Main App — Header
@@ -124,6 +128,9 @@ export const translations = {
       title: 'Histórico',
       empty: 'Nenhuma análise ainda',
       emails: 'emails',
+      productive: 'Produtivos',
+      unproductive: 'Improdutivos',
+      batch: 'Lotes / Gmail',
     },
 
     // Empty State
@@ -178,6 +185,10 @@ export const translations = {
       footer: 'MailSense · YamataDev © 2025',
       langButton: '🇧🇷 Mudar para Português',
       langHint: 'Click to change language',
+      roles: {
+        'financial_analyst': 'Financial Analyst',
+        'operations_manager': 'Operations Manager',
+      },
     },
 
     // Main App — Header
@@ -270,6 +281,9 @@ export const translations = {
       title: 'History',
       empty: 'No analyses yet',
       emails: 'emails',
+      productive: 'Productive',
+      unproductive: 'Unproductive',
+      batch: 'Batches / Gmail',
     },
 
     // Empty State

@@ -24,7 +24,7 @@ try:
 except LookupError:
     nltk.download("stopwords", quiet=True)
 
-app = FastAPI(title="Email Classifier", version="2.0.0")
+app = FastAPI(title="AutoU Email Classifier", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,7 +37,7 @@ app.add_middleware(
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-SYSTEM_PROMPT = """Você é um sistema especializado em triagem de emails corporativos para uma grande instituição financeira.
+SYSTEM_PROMPT_PT = """Você é um sistema especializado em triagem de emails corporativos para uma grande instituição financeira.
 
 Analise o email fornecido e retorne APENAS um JSON válido (sem markdown, sem texto extra) no formato abaixo:
 
@@ -58,7 +58,34 @@ Critérios:
 Prioridade para PRODUTIVOS: ALTA (urgente/prazo), MEDIA (padrão), BAIXA (informativo)
 Prioridade para IMPRODUTIVOS: sempre BAIXA
 
+Responda todos os campos de texto (reason, key_topics, suggested_subject, suggested_response) em PORTUGUÊS BRASILEIRO.
 A resposta sugerida deve soar natural, profissional e representar bem uma instituição financeira de grande porte."""
+
+SYSTEM_PROMPT_EN = """You are a specialized corporate email triage system for a large financial institution.
+
+Analyze the provided email and return ONLY valid JSON (no markdown, no extra text) in the format below:
+
+{
+  "classification": "PRODUTIVO" or "IMPRODUTIVO",
+  "confidence": number between 0.0 and 1.0,
+  "reason": "objective justification of the classification in 1-2 sentences",
+  "priority": "ALTA", "MEDIA" or "BAIXA",
+  "key_topics": ["list", "of", "identified", "topics"],
+  "suggested_subject": "Subject line for the automated reply",
+  "suggested_response": "Complete, professional automated reply appropriate for a major financial institution"
+}
+
+Note: classification and priority values must remain as shown above (PRODUTIVO/IMPRODUTIVO, ALTA/MEDIA/BAIXA) — they are internal system codes.
+
+Criteria:
+- PRODUTIVO: requires action or response (support, requests, case updates, operational questions, contracts, reports, complaints)
+- IMPRODUTIVO: requires no immediate action (greetings, thank-yous, social messages, informational spam)
+
+Priority for PRODUTIVO: ALTA (urgent/deadline), MEDIA (standard), BAIXA (informational)
+Priority for IMPRODUTIVO: always BAIXA
+
+Respond with all text fields (reason, key_topics, suggested_subject, suggested_response) in ENGLISH.
+The suggested response should sound natural, professional, and represent a major financial institution well."""
 
 
 def preprocess_text(text: str) -> str:
@@ -79,15 +106,16 @@ def extract_text_from_pdf(file_bytes: bytes) -> str:
     return "".join(page.extract_text() or "" for page in reader.pages).strip()
 
 
-def classify_email(raw_text: str) -> dict:
+def classify_email(raw_text: str, lang: str = "pt-BR") -> dict:
     processed_text = preprocess_text(raw_text)
+    system_prompt = SYSTEM_PROMPT_EN if lang == "en-US" else SYSTEM_PROMPT_PT
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=1024,
-        system=SYSTEM_PROMPT,
+        system=system_prompt,
         messages=[{
             "role": "user",
-            "content": f"Email original:\n{raw_text}\n\nTexto pré-processado (NLP):\n{processed_text}",
+            "content": f"Original email:\n{raw_text}\n\nPre-processed text (NLP):\n{processed_text}",
         }],
     )
     response_text = message.content[0].text.strip()
@@ -159,18 +187,20 @@ def fetch_gmail_emails(gmail_user: str, app_password: str, limit: int = 10) -> l
 
 class TextRequest(BaseModel):
     text: str
+    lang: str = "pt-BR"
 
 class GmailRequest(BaseModel):
     email: str
     app_password: str
     limit: int = 10
+    lang: str = "pt-BR"
 
 
 # ─── Routes ───────────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
-    return {"status": "Email Classifier API", "version": "2.0.0"}
+    return {"status": "MailSense Email Classifier API", "version": "2.0.0"}
 
 @app.get("/health")
 def health():
@@ -184,7 +214,7 @@ def analyze_text(request: TextRequest):
     if len(request.text) > 50000:
         raise HTTPException(status_code=400, detail="Email text too long (max 50000 chars)")
     try:
-        result = classify_email(request.text)
+        result = classify_email(request.text, lang=request.lang)
         return {"success": True, "data": result}
     except json.JSONDecodeError as e:
         raise HTTPException(status_code=500, detail=f"AI response parsing error: {str(e)}")
@@ -193,7 +223,7 @@ def analyze_text(request: TextRequest):
 
 
 @app.post("/analyze/file")
-async def analyze_file(file: UploadFile = File(...)):
+async def analyze_file(file: UploadFile = File(...), lang: str = "pt-BR"):
     if not file.filename:
         raise HTTPException(status_code=400, detail="No file provided")
     if not file.filename.endswith((".txt", ".pdf")):
@@ -205,7 +235,7 @@ async def analyze_file(file: UploadFile = File(...)):
         text = extract_text_from_pdf(file_bytes) if file.filename.endswith(".pdf") else file_bytes.decode("utf-8", errors="ignore")
         if not text.strip():
             raise HTTPException(status_code=422, detail="File appears to be empty")
-        result = classify_email(text)
+        result = classify_email(text, lang=lang)
         return {"success": True, "data": result, "filename": file.filename}
     except HTTPException:
         raise
@@ -214,7 +244,7 @@ async def analyze_file(file: UploadFile = File(...)):
 
 
 @app.post("/analyze/batch")
-async def analyze_batch(files: List[UploadFile] = File(...)):
+async def analyze_batch(files: List[UploadFile] = File(...), lang: str = "pt-BR"):
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
     if len(files) > 20:
@@ -233,7 +263,7 @@ async def analyze_batch(files: List[UploadFile] = File(...)):
             if not text.strip():
                 results.append({"filename": file.filename, "success": False, "error": "Empty file"})
                 continue
-            data = classify_email(text)
+            data = classify_email(text, lang=lang)
             results.append({"filename": file.filename, "success": True, "data": data})
         except Exception as e:
             results.append({"filename": file.filename, "success": False, "error": str(e)})
@@ -249,18 +279,18 @@ def gmail_fetch_and_analyze(request: GmailRequest):
     except imaplib.IMAP4.error:
         raise HTTPException(
             status_code=401,
-            detail="Falha na autenticação Gmail. Verifique o email e o App Password. Certifique-se de que o IMAP está habilitado nas configurações do Gmail."
+            detail="Gmail authentication failed. Check your email and App Password. Make sure IMAP is enabled in Gmail settings."
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Gmail connection error: {str(e)}")
 
     results = []
     for em in emails:
-        full_text = f"De: {em['sender']}\nAssunto: {em['subject']}\nData: {em['date']}\n\n{em['body']}"
+        full_text = f"From: {em['sender']}\nSubject: {em['subject']}\nDate: {em['date']}\n\n{em['body']}"
         if not full_text.strip():
             continue
         try:
-            data = classify_email(full_text[:8000])
+            data = classify_email(full_text[:8000], lang=request.lang)
             results.append({"subject": em["subject"], "sender": em["sender"], "date": em["date"], "success": True, "data": data})
         except Exception as e:
             results.append({"subject": em["subject"], "sender": em["sender"], "date": em["date"], "success": False, "error": str(e)})

@@ -44,10 +44,13 @@ function LangToggle({ lang, setLang }) {
 
 // ─── Small Utilities ──────────────────────────────────────────────────────
 
-function Badge({ type }) {
+const PRIORITY_ORDER = { ALTA: 0, MEDIA: 1, BAIXA: 2 }
+
+function Badge({ type, lang }) {
+  const tr = translations[lang || 'pt-BR'].results
   const config = {
-    PRODUTIVO: { label: 'Produtivo', color: 'var(--productive)', bg: 'var(--productive-glow)', border: 'var(--productive-border)' },
-    IMPRODUTIVO: { label: 'Improdutivo', color: 'var(--unproductive)', bg: 'var(--unproductive-glow)', border: 'var(--unproductive-border)' },
+    PRODUTIVO: { label: tr.productive, color: 'var(--productive)', bg: 'var(--productive-glow)', border: 'var(--productive-border)' },
+    IMPRODUTIVO: { label: tr.unproductive, color: 'var(--unproductive)', bg: 'var(--unproductive-glow)', border: 'var(--unproductive-border)' },
   }
   const c = config[type] || config.IMPRODUTIVO
   return (
@@ -58,8 +61,13 @@ function Badge({ type }) {
   )
 }
 
-function PriorityBadge({ priority }) {
-  const config = { ALTA: { color: 'var(--high)', label: 'Alta' }, MEDIA: { color: 'var(--medium)', label: 'Média' }, BAIXA: { color: 'var(--low)', label: 'Baixa' } }
+function PriorityBadge({ priority, lang }) {
+  const tr = translations[lang || 'pt-BR'].results
+  const config = {
+    ALTA:  { color: 'var(--high)',   label: tr.high },
+    MEDIA: { color: 'var(--medium)', label: tr.medium },
+    BAIXA: { color: 'var(--low)',    label: tr.low },
+  }
   const c = config[priority] || config.BAIXA
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '3px 10px', borderRadius: '100px', fontSize: '10px', fontWeight: '500', fontFamily: 'var(--font-mono)', color: c.color, background: `${c.color}18`, border: `1px solid ${c.color}30` }}>
@@ -68,13 +76,14 @@ function PriorityBadge({ priority }) {
   )
 }
 
-function ConfidenceBar({ value }) {
+function ConfidenceBar({ value, lang }) {
+  const tr = translations[lang || 'pt-BR'].results
   const pct = Math.round(value * 100)
   const color = pct >= 80 ? 'var(--productive)' : pct >= 50 ? 'var(--accent-blue)' : 'var(--unproductive)'
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-        <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Confiança</span>
+        <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{tr.confidence}</span>
         <span style={{ fontSize: '12px', fontWeight: '600', color, fontFamily: 'var(--font-mono)' }}>{pct}%</span>
       </div>
       <div style={{ height: '3px', background: 'var(--bg-void)', borderRadius: '2px', overflow: 'hidden' }}>
@@ -84,26 +93,27 @@ function ConfidenceBar({ value }) {
   )
 }
 
-function CopyButton({ text }) {
+function CopyButton({ text, lang }) {
   const [copied, setCopied] = useState(false)
+  const tr = translations[lang || 'pt-BR'].results
   return (
     <button onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
       style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-default)', background: 'transparent', color: copied ? 'var(--productive)' : 'var(--text-secondary)', fontSize: '11px', fontFamily: 'var(--font-body)', cursor: 'pointer', transition: 'all 0.2s ease' }}>
-      {copied ? <><Check size={11} /> Copiado</> : <><Copy size={11} /> Copiar</>}
+      {copied ? <><Check size={11} /> {tr.copied}</> : <><Copy size={11} /> {tr.copy}</>}
     </button>
   )
 }
 
 // ─── Result Card (single email) ───────────────────────────────────────────
 
-function ResultCard({ data, filename, subject, sender, collapsed = false, onDelete }) {
+function ResultCard({ data, filename, subject, sender, collapsed = false, onDelete, lang }) {
   const [open, setOpen] = useState(!collapsed)
+  const tr = translations[lang || 'pt-BR'].results
   const isProductive = data.classification === 'PRODUTIVO'
   const label = subject || filename || 'Email analisado'
 
   return (
     <div style={{ border: `1px solid ${isProductive ? 'var(--productive-border)' : 'var(--unproductive-border)'}`, borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)', overflow: 'hidden', boxShadow: 'var(--shadow-card)' }}>
-      {/* Header — always visible */}
       <div onClick={() => setOpen(v => !v)} style={{ padding: '14px 18px', background: isProductive ? 'var(--productive-glow)' : 'var(--unproductive-glow)', borderBottom: open ? `1px solid ${isProductive ? 'var(--productive-border)' : 'var(--unproductive-border)'}` : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
           <div style={{ width: 32, height: 32, borderRadius: 'var(--radius-sm)', background: isProductive ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -115,8 +125,8 @@ function ResultCard({ data, filename, subject, sender, collapsed = false, onDele
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          <Badge type={data.classification} />
-          <PriorityBadge priority={data.priority} />
+          <Badge type={data.classification} lang={lang} />
+          <PriorityBadge priority={data.priority} lang={lang} />
           {onDelete && (
             <button onClick={e => { e.stopPropagation(); onDelete() }} title="Remover" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-sm)', transition: 'color 0.15s ease' }}
               onMouseEnter={e => e.currentTarget.style.color = 'var(--high)'}
@@ -128,21 +138,20 @@ function ResultCard({ data, filename, subject, sender, collapsed = false, onDele
         </div>
       </div>
 
-      {/* Body — collapsible */}
       {open && (
         <div style={{ padding: '18px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '16px', alignItems: 'start' }}>
-            <ConfidenceBar value={data.confidence} />
+            <ConfidenceBar value={data.confidence} lang={lang} />
             <div>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>Justificativa</div>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '5px' }}>{tr.reason}</div>
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>{data.reason}</p>
             </div>
           </div>
 
           {data.key_topics?.length > 0 && (
             <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-              {data.key_topics.map((t, i) => (
-                <span key={i} style={{ padding: '3px 9px', borderRadius: '100px', background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{t}</span>
+              {data.key_topics.map((topic, i) => (
+                <span key={i} style={{ padding: '3px 9px', borderRadius: '100px', background: 'var(--bg-elevated)', border: '1px solid var(--border-default)', fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{topic}</span>
               ))}
             </div>
           )}
@@ -151,10 +160,10 @@ function ResultCard({ data, filename, subject, sender, collapsed = false, onDele
             <div style={{ padding: '10px 14px', background: 'var(--bg-elevated)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
                 <MessageSquare size={12} color="var(--text-muted)" />
-                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Resposta Sugerida</span>
+                <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{tr.suggestedResponse}</span>
                 {data.suggested_subject && <span style={{ fontSize: '11px', color: 'var(--text-secondary)', background: 'var(--bg-surface)', padding: '2px 7px', borderRadius: '4px', border: '1px solid var(--border-subtle)' }}>{data.suggested_subject}</span>}
               </div>
-              <CopyButton text={data.suggested_response} />
+              <CopyButton text={data.suggested_response} lang={lang} />
             </div>
             <div style={{ padding: '14px', background: 'var(--bg-base)' }}>
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.75', whiteSpace: 'pre-wrap' }}>{data.suggested_response}</p>
@@ -168,7 +177,8 @@ function ResultCard({ data, filename, subject, sender, collapsed = false, onDele
 
 // ─── Batch Summary Bar ────────────────────────────────────────────────────
 
-function BatchSummary({ results }) {
+function BatchSummary({ results, lang }) {
+  const tr = translations[lang || 'pt-BR'].batch
   const total = results.length
   const productive = results.filter(r => r.success && r.data?.classification === 'PRODUTIVO').length
   const unproductive = results.filter(r => r.success && r.data?.classification === 'IMPRODUTIVO').length
@@ -179,11 +189,11 @@ function BatchSummary({ results }) {
   return (
     <div style={{ display: 'flex', gap: '0', padding: '14px 20px', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-lg)', marginBottom: '16px' }}>
       {[
-        { label: 'Total', val: total, color: 'var(--text-primary)' },
-        { label: 'Produtivos', val: productive, color: 'var(--productive)' },
-        { label: 'Improdutivos', val: unproductive, color: 'var(--unproductive)' },
-        { label: 'Confiança avg', val: `${avgConf}%`, color: 'var(--accent-blue)' },
-        ...(failed > 0 ? [{ label: 'Erros', val: failed, color: 'var(--high)' }] : []),
+        { label: tr.total, val: total, color: 'var(--text-primary)' },
+        { label: tr.productive, val: productive, color: 'var(--productive)' },
+        { label: tr.unproductive, val: unproductive, color: 'var(--unproductive)' },
+        { label: tr.avgConfidence, val: `${avgConf}%`, color: 'var(--accent-blue)' },
+        ...(failed > 0 ? [{ label: tr.errors, val: failed, color: 'var(--high)' }] : []),
       ].map((s, i, arr) => (
         <div key={i} style={{ flex: 1, textAlign: 'center', borderRight: i < arr.length - 1 ? '1px solid var(--border-subtle)' : 'none', padding: '0 16px' }}>
           <div style={{ fontSize: '20px', fontWeight: '700', color: s.color, fontFamily: 'var(--font-mono)' }}>{s.val}</div>
@@ -196,8 +206,9 @@ function BatchSummary({ results }) {
 
 // ─── Upload Zone ───────────────────────────────────────────────────────────
 
-function UploadZone({ onFiles, isDragging, setIsDragging, multiple = false }) {
+function UploadZone({ onFiles, isDragging, setIsDragging, multiple = false, lang }) {
   const inputRef = useRef()
+  const ti = translations[lang || 'pt-BR'].input
   const handleDrop = useCallback(e => {
     e.preventDefault(); setIsDragging(false)
     const files = Array.from(e.dataTransfer.files)
@@ -214,10 +225,10 @@ function UploadZone({ onFiles, isDragging, setIsDragging, multiple = false }) {
         {multiple ? <Layers size={18} color="var(--text-secondary)" /> : <Upload size={18} color="var(--text-secondary)" />}
       </div>
       <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '5px' }}>
-        Arraste {multiple ? 'os arquivos' : 'um arquivo'} ou <span style={{ color: 'var(--accent-blue)' }}>clique para selecionar</span>
+        {multiple ? ti.dragFiles : ti.dragFile} <span style={{ color: 'var(--accent-blue)' }}>{ti.clickSelect}</span>
       </div>
       <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
-        .TXT · .PDF · máx 5MB{multiple ? ' · até 20 arquivos' : ''}
+        {multiple ? ti.fileHintMultiple : ti.fileHintSingle}
       </div>
     </div>
   )
@@ -242,7 +253,7 @@ function GmailTab({ onResults, lang }) {
     try {
       const resp = await fetch(`${API_BASE}/gmail/fetch-and-analyze`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: gmailUser, app_password: appPassword, limit }),
+        body: JSON.stringify({ email: gmailUser, app_password: appPassword, limit, lang }),
       })
       if (!resp.ok) throw new Error((await resp.json()).detail || 'Erro ao conectar ao Gmail')
       const data = await resp.json()
@@ -323,37 +334,102 @@ function GmailTab({ onResults, lang }) {
 
 // ─── History Item ──────────────────────────────────────────────────────────
 
-function HistoryItem({ item, onSelect, onDelete, isActive }) {
+function HistoryItem({ item, onSelect, onDelete, isActive, lang }) {
+  const tr = translations[lang || 'pt-BR'].results
   const isBatch = item.type === 'batch' || item.type === 'gmail'
   const isProductive = !isBatch && item.result?.data?.classification === 'PRODUTIVO'
+  const priority = item.result?.data?.priority
+  const priorityColor = { ALTA: 'var(--high)', MEDIA: 'var(--medium)', BAIXA: 'var(--low)' }[priority] || 'var(--text-faint)'
+  const priorityLabel = { ALTA: tr.high, MEDIA: tr.medium, BAIXA: tr.low }[priority] || priority
+  const classLabel = isProductive ? tr.productive : tr.unproductive
+
   return (
     <div style={{ position: 'relative' }}
       onMouseEnter={e => e.currentTarget.querySelector('.del-btn').style.opacity = '1'}
       onMouseLeave={e => e.currentTarget.querySelector('.del-btn').style.opacity = '0'}>
-      <button onClick={() => onSelect(item)} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', paddingRight: '28px', borderRadius: 'var(--radius-md)', background: isActive ? 'var(--bg-elevated)' : 'transparent', border: `1px solid ${isActive ? 'var(--border-default)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: '4px' }}
+      <button onClick={() => onSelect(item)}
+        style={{ width: '100%', textAlign: 'left', padding: '8px 10px', paddingRight: '26px', borderRadius: 'var(--radius-md)', background: isActive ? 'var(--bg-elevated)' : 'transparent', border: `1px solid ${isActive ? 'var(--border-default)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: '3px' }}
         onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-hover)' }}
         onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-            <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: isBatch ? 'var(--accent-blue)' : isProductive ? 'var(--productive)' : 'var(--unproductive)' }} />
-            <span style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-              {isBatch ? `${item.count} emails` : item.result?.data?.classification}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: isBatch ? 'var(--accent-blue)' : isProductive ? 'var(--productive)' : 'var(--unproductive)' }} />
+            <span style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+              {isBatch ? `${item.count} emails` : classLabel}
             </span>
           </div>
-          {!isBatch && <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Math.round((item.result?.data?.confidence || 0) * 100)}%</span>}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {!isBatch && priority && (
+              <span style={{ fontSize: '9px', color: priorityColor, fontFamily: 'var(--font-mono)', fontWeight: '600' }}>
+                {priorityLabel}
+              </span>
+            )}
+            {!isBatch && <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Math.round((item.result?.data?.confidence || 0) * 100)}%</span>}
+          </div>
         </div>
-        <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{ fontSize: '10px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {item.label}
         </div>
-        <div style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>{item.timestamp}</div>
+        <div style={{ fontSize: '9px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>{item.timestamp}</div>
       </button>
       <button className="del-btn" onClick={e => { e.stopPropagation(); onDelete(item.id) }}
-        style={{ position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', opacity: 0, transition: 'opacity 0.15s ease, color 0.15s ease', borderRadius: 'var(--radius-sm)' }}
+        style={{ position: 'absolute', right: '4px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', opacity: 0, transition: 'opacity 0.15s ease, color 0.15s ease', borderRadius: 'var(--radius-sm)' }}
         onMouseEnter={e => e.currentTarget.style.color = 'var(--high)'}
         onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
-        <Trash2 size={11} />
+        <Trash2 size={10} />
       </button>
     </div>
+  )
+}
+
+function GroupedHistory({ history, onSelect, onDelete, activeHistoryId, lang }) {
+  const tr = translations[lang || 'pt-BR'].history
+  const PRIORITY_ORDER = { ALTA: 0, MEDIA: 1, BAIXA: 2 }
+
+  const singleItems = history.filter(h => h.type === 'single')
+  const batchItems  = history.filter(h => h.type === 'batch' || h.type === 'gmail')
+
+  const productive = singleItems
+    .filter(h => h.result?.data?.classification === 'PRODUTIVO')
+    .sort((a, b) => (PRIORITY_ORDER[a.result?.data?.priority] ?? 9) - (PRIORITY_ORDER[b.result?.data?.priority] ?? 9))
+
+  const unproductive = singleItems
+    .filter(h => h.result?.data?.classification === 'IMPRODUTIVO')
+    .sort((a, b) => (PRIORITY_ORDER[a.result?.data?.priority] ?? 9) - (PRIORITY_ORDER[b.result?.data?.priority] ?? 9))
+
+  if (history.length === 0) {
+    return <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--text-faint)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{tr.empty}</div>
+  }
+
+  const GroupLabel = ({ color, label, count }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 8px 4px', marginTop: '6px' }}>
+      <div style={{ width: 5, height: 5, borderRadius: '50%', background: color, flexShrink: 0 }} />
+      <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.07em', flex: 1 }}>{label}</span>
+      <span style={{ fontSize: '9px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>{count}</span>
+    </div>
+  )
+
+  return (
+    <>
+      {productive.length > 0 && (
+        <>
+          <GroupLabel color="var(--productive)" label={tr.productive} count={productive.length} />
+          {productive.map(item => <HistoryItem key={item.id} item={item} onSelect={onSelect} onDelete={onDelete} isActive={item.id === activeHistoryId} lang={lang} />)}
+        </>
+      )}
+      {unproductive.length > 0 && (
+        <>
+          <GroupLabel color="var(--unproductive)" label={tr.unproductive} count={unproductive.length} />
+          {unproductive.map(item => <HistoryItem key={item.id} item={item} onSelect={onSelect} onDelete={onDelete} isActive={item.id === activeHistoryId} lang={lang} />)}
+        </>
+      )}
+      {batchItems.length > 0 && (
+        <>
+          <GroupLabel color="var(--accent-blue)" label={tr.batch} count={batchItems.length} />
+          {batchItems.map(item => <HistoryItem key={item.id} item={item} onSelect={onSelect} onDelete={onDelete} isActive={item.id === activeHistoryId} lang={lang} />)}
+        </>
+      )}
+    </>
   )
 }
 
@@ -392,13 +468,13 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
     try {
       let res
       if (tab === 'text') {
-        const resp = await fetch(`${API_BASE}/analyze/text`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text }) })
+        const resp = await fetch(`${API_BASE}/analyze/text`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text, lang }) })
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Erro')
         res = await resp.json()
         addSingleToHistory(res, text.slice(0, 40))
       } else {
         const fd = new FormData(); fd.append('file', files[0])
-        const resp = await fetch(`${API_BASE}/analyze/file`, { method: 'POST', body: fd })
+        const resp = await fetch(`${API_BASE}/analyze/file?lang=${lang}`, { method: 'POST', body: fd })
         if (!resp.ok) throw new Error((await resp.json()).detail || 'Erro')
         res = await resp.json()
         addSingleToHistory(res, files[0].name)
@@ -412,7 +488,7 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
     try {
       const fd = new FormData()
       files.forEach(f => fd.append('files', f))
-      const resp = await fetch(`${API_BASE}/analyze/batch`, { method: 'POST', body: fd })
+      const resp = await fetch(`${API_BASE}/analyze/batch?lang=${lang}`, { method: 'POST', body: fd })
       if (!resp.ok) throw new Error((await resp.json()).detail || 'Erro')
       const data = await resp.json()
       setBatchResults(data.results)
@@ -494,7 +570,7 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
             </div>
             <div>
               <div style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: '500' }}>{user.name}</div>
-              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{user.role}</div>
+              <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{t.login.roles[user.roleKey] || user.roleKey}</div>
             </div>
           </div>
           <button onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '5px 10px', borderRadius: 'var(--radius-sm)', background: 'none', border: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '12px', cursor: 'pointer', transition: 'all 0.15s ease' }}
@@ -512,10 +588,7 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
             <Clock size={10} color="var(--text-muted)" />
             <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.history.title}</span>
           </div>
-          {history.length === 0
-            ? <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--text-faint)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{t.history.empty}</div>
-            : history.map(item => <HistoryItem key={item.id} item={item} onSelect={handleHistorySelect} onDelete={handleDeleteHistory} isActive={item.id === activeHistoryId} />)
-          }
+          <GroupedHistory history={history} onSelect={handleHistorySelect} onDelete={handleDeleteHistory} activeHistoryId={activeHistoryId} lang={lang} />
         </aside>
 
         {/* Main */}
@@ -556,18 +629,18 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
                     </div>
                     <button onClick={() => setFiles([])} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={13} /></button>
                   </div>
-                ) : <UploadZone onFiles={f => setFiles([f[0]])} isDragging={isDragging} setIsDragging={setIsDragging} />
+                ) : <UploadZone onFiles={f => setFiles([f[0]])} isDragging={isDragging} setIsDragging={setIsDragging} lang={lang} />
               )}
 
               {/* Batch tab */}
               {tab === 'batch' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <UploadZone onFiles={f => setFiles(prev => [...prev, ...f].slice(0, 20))} isDragging={isDragging} setIsDragging={setIsDragging} multiple />
+                  <UploadZone onFiles={f => setFiles(prev => [...prev, ...f].slice(0, 20))} isDragging={isDragging} setIsDragging={setIsDragging} multiple lang={lang} />
                   {files.length > 0 && (
                     <div style={{ borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', overflow: 'hidden' }}>
                       <div style={{ padding: '10px 14px', background: 'var(--bg-elevated)', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{files.length} arquivo(s) selecionado(s)</span>
-                        <button onClick={() => setFiles([])} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}><X size={11} /> Limpar</button>
+                        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>{files.length} {t.input.filesSelected}</span>
+                        <button onClick={() => setFiles([])} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}><X size={11} /> {t.input.clearAll}</button>
                       </div>
                       <div style={{ maxHeight: '140px', overflowY: 'auto' }}>
                         {files.map((f, i) => (
@@ -624,17 +697,17 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
           {/* Single result */}
           {result && !batchResults && (
             <div className="fade-in">
-              <ResultCard data={result.data} filename={result.filename} onDelete={() => { setResult(null); setActiveHistoryId(null) }} />
+              <ResultCard data={result.data} filename={result.filename} onDelete={() => { setResult(null); setActiveHistoryId(null) }} lang={lang} />
             </div>
           )}
 
           {/* Batch / Gmail results */}
           {batchResults && (
             <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <BatchSummary results={batchResults} />
+              <BatchSummary results={batchResults} lang={lang} />
               {batchResults.map((r, i) => (
                 r.success
-                  ? <ResultCard key={i} data={r.data} filename={r.filename} subject={r.subject} sender={r.sender} collapsed
+                  ? <ResultCard key={i} data={r.data} filename={r.filename} subject={r.subject} sender={r.sender} collapsed lang={lang}
                       onDelete={() => setBatchResults(prev => prev.filter((_, j) => j !== i))} />
                   : (
                     <div key={i} style={{ padding: '14px 18px', borderRadius: 'var(--radius-md)', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -678,11 +751,11 @@ export default function MainApp({ user, onLogout, lang, setLang }) {
               <Info size={10} color="var(--text-muted)" />
               <span style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{t.panel.categories}</span>
             </div>
-            {[{ type: 'PRODUTIVO', color: 'var(--productive)', desc: t.panel.productiveDesc }, { type: 'IMPRODUTIVO', color: 'var(--unproductive)', desc: t.panel.unproductiveDesc }].map(c => (
+            {[{ type: 'PRODUTIVO', label: t.results.productive, color: 'var(--productive)', desc: t.panel.productiveDesc }, { type: 'IMPRODUTIVO', label: t.results.unproductive, color: 'var(--unproductive)', desc: t.panel.unproductiveDesc }].map(c => (
               <div key={c.type} style={{ marginBottom: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: c.color, flexShrink: 0 }} />
-                  <span style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{c.type}</span>
+                  <span style={{ fontSize: '10px', fontWeight: '600', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{c.label}</span>
                 </div>
                 <p style={{ fontSize: '10px', color: 'var(--text-muted)', paddingLeft: '12px', lineHeight: '1.5' }}>{c.desc}</p>
               </div>

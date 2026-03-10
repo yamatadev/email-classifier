@@ -3,8 +3,8 @@ import { Zap, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle, Globe } from 'lu
 import { translations } from '../i18n'
 
 const DEMO_USERS = [
-  { email: 'demo@autou.com.br', password: 'autou2025', name: 'Demo User', role: 'Analista Financeiro' },
-  { email: 'admin@autou.com.br', password: 'admin123', name: 'Admin', role: 'Gestor de Operações' },
+  { email: 'demo@autou.com.br', password: 'autou2025', name: 'Demo User', roleKey: 'financial_analyst' },
+  { email: 'admin@autou.com.br', password: 'admin123', name: 'Admin', roleKey: 'operations_manager' },
 ]
 
 // ─── Language Toggle ──────────────────────────────────────────────────────
