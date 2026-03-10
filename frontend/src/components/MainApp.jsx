@@ -4,7 +4,7 @@ import {
   AlertCircle, Clock, TrendingUp, TrendingDown,
   Zap, Shield, BarChart3, X, RotateCcw, Info,
   MessageSquare, LogOut, User, Mail, Key,
-  ChevronDown, ChevronUp, Layers, Eye, EyeOff
+  ChevronDown, ChevronUp, Layers, Eye, EyeOff, Trash2
 } from 'lucide-react'
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
@@ -63,7 +63,7 @@ function CopyButton({ text }) {
 
 // ─── Result Card (single email) ───────────────────────────────────────────
 
-function ResultCard({ data, filename, subject, sender, collapsed = false }) {
+function ResultCard({ data, filename, subject, sender, collapsed = false, onDelete }) {
   const [open, setOpen] = useState(!collapsed)
   const isProductive = data.classification === 'PRODUTIVO'
   const label = subject || filename || 'Email analisado'
@@ -84,6 +84,13 @@ function ResultCard({ data, filename, subject, sender, collapsed = false }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <Badge type={data.classification} />
           <PriorityBadge priority={data.priority} />
+          {onDelete && (
+            <button onClick={e => { e.stopPropagation(); onDelete() }} title="Remover" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-sm)', transition: 'color 0.15s ease' }}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--high)'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+              <Trash2 size={13} />
+            </button>
+          )}
           <div style={{ color: 'var(--text-muted)' }}>{open ? <ChevronUp size={14} /> : <ChevronDown size={14} />}</div>
         </div>
       </div>
@@ -221,10 +228,11 @@ function GmailTab({ onResults }) {
         {showGuide && (
           <div style={{ padding: '14px', background: 'var(--bg-base)', borderTop: '1px solid var(--border-subtle)' }}>
             {[
-              'Acesse myaccount.google.com',
-              'Vá em Segurança → Verificação em duas etapas (Ative, pois é necessário)',
-              'Acesse: https://myaccount.google.com/apppasswords',
-              'Crie uma nova senha com nome "MailSense"',
+              'Acesse myaccount.google.com → Segurança',
+              'Clique em "Verificação em duas etapas" e ATIVE (obrigatório)',
+              'Após ativar, volte em Segurança e role para baixo',
+              'Clique em "Senhas de app" (só aparece com 2FA ativo)',
+              'Digite um nome como "MailSense" e clique em Criar',
               'Copie a senha de 16 caracteres gerada',
             ].map((step, i) => (
               <div key={i} style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
@@ -290,27 +298,37 @@ function GmailTab({ onResults }) {
 
 // ─── History Item ──────────────────────────────────────────────────────────
 
-function HistoryItem({ item, onSelect, isActive }) {
+function HistoryItem({ item, onSelect, onDelete, isActive }) {
   const isBatch = item.type === 'batch' || item.type === 'gmail'
   const isProductive = !isBatch && item.result?.data?.classification === 'PRODUTIVO'
   return (
-    <button onClick={() => onSelect(item)} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', borderRadius: 'var(--radius-md)', background: isActive ? 'var(--bg-elevated)' : 'transparent', border: `1px solid ${isActive ? 'var(--border-default)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: '4px' }}
-      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-hover)' }}
-      onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-          <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: isBatch ? 'var(--accent-blue)' : isProductive ? 'var(--productive)' : 'var(--unproductive)' }} />
-          <span style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
-            {isBatch ? `${item.count} emails` : item.result?.data?.classification}
-          </span>
+    <div style={{ position: 'relative' }}
+      onMouseEnter={e => e.currentTarget.querySelector('.del-btn').style.opacity = '1'}
+      onMouseLeave={e => e.currentTarget.querySelector('.del-btn').style.opacity = '0'}>
+      <button onClick={() => onSelect(item)} style={{ width: '100%', textAlign: 'left', padding: '10px 12px', paddingRight: '28px', borderRadius: 'var(--radius-md)', background: isActive ? 'var(--bg-elevated)' : 'transparent', border: `1px solid ${isActive ? 'var(--border-default)' : 'transparent'}`, cursor: 'pointer', transition: 'all 0.15s ease', display: 'flex', flexDirection: 'column', gap: '4px' }}
+        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'var(--bg-hover)' }}
+        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', flexShrink: 0, background: isBatch ? 'var(--accent-blue)' : isProductive ? 'var(--productive)' : 'var(--unproductive)' }} />
+            <span style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
+              {isBatch ? `${item.count} emails` : item.result?.data?.classification}
+            </span>
+          </div>
+          {!isBatch && <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Math.round((item.result?.data?.confidence || 0) * 100)}%</span>}
         </div>
-        {!isBatch && <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Math.round((item.result?.data?.confidence || 0) * 100)}%</span>}
-      </div>
-      <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-        {item.label}
-      </div>
-      <div style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>{item.timestamp}</div>
-    </button>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {item.label}
+        </div>
+        <div style={{ fontSize: '10px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)' }}>{item.timestamp}</div>
+      </button>
+      <button className="del-btn" onClick={e => { e.stopPropagation(); onDelete(item.id) }}
+        style={{ position: 'absolute', right: '6px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px', opacity: 0, transition: 'opacity 0.15s ease, color 0.15s ease', borderRadius: 'var(--radius-sm)' }}
+        onMouseEnter={e => e.currentTarget.style.color = 'var(--high)'}
+        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+        <Trash2 size={11} />
+      </button>
+    </div>
   )
 }
 
@@ -395,6 +413,15 @@ export default function MainApp({ user, onLogout }) {
     else { setBatchResults(item.batchResults); setBatchLabel(item.label); setResult(null) }
   }
 
+  const handleDeleteHistory = (id) => {
+    setHistory(prev => prev.filter(h => h.id !== id))
+    if (activeHistoryId === id) {
+      setResult(null)
+      setBatchResults(null)
+      setActiveHistoryId(null)
+    }
+  }
+
   const canSubmit = !loading && (
     (tab === 'text' && text.trim().length > 0) ||
     (tab === 'file' && files.length === 1) ||
@@ -460,7 +487,7 @@ export default function MainApp({ user, onLogout }) {
           </div>
           {history.length === 0
             ? <div style={{ textAlign: 'center', padding: '28px 10px', color: 'var(--text-faint)', fontSize: '11px', fontFamily: 'var(--font-mono)' }}>Nenhuma análise ainda</div>
-            : history.map(item => <HistoryItem key={item.id} item={item} onSelect={handleHistorySelect} isActive={item.id === activeHistoryId} />)
+            : history.map(item => <HistoryItem key={item.id} item={item} onSelect={handleHistorySelect} onDelete={handleDeleteHistory} isActive={item.id === activeHistoryId} />)
           }
         </aside>
 
@@ -570,7 +597,7 @@ export default function MainApp({ user, onLogout }) {
           {/* Single result */}
           {result && !batchResults && (
             <div className="fade-in">
-              <ResultCard data={result.data} filename={result.filename} />
+              <ResultCard data={result.data} filename={result.filename} onDelete={() => { setResult(null); setActiveHistoryId(null) }} />
             </div>
           )}
 
@@ -580,17 +607,28 @@ export default function MainApp({ user, onLogout }) {
               <BatchSummary results={batchResults} />
               {batchResults.map((r, i) => (
                 r.success
-                  ? <ResultCard key={i} data={r.data} filename={r.filename} subject={r.subject} sender={r.sender} collapsed />
+                  ? <ResultCard key={i} data={r.data} filename={r.filename} subject={r.subject} sender={r.sender} collapsed
+                      onDelete={() => setBatchResults(prev => prev.filter((_, j) => j !== i))} />
                   : (
                     <div key={i} style={{ padding: '14px 18px', borderRadius: 'var(--radius-md)', background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <AlertCircle size={14} color="var(--high)" />
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{r.filename || r.subject || 'Arquivo'}</div>
                         <div style={{ fontSize: '11px', color: '#FCA5A5', fontFamily: 'var(--font-mono)' }}>{r.error}</div>
                       </div>
+                      <button onClick={() => setBatchResults(prev => prev.filter((_, j) => j !== i))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '4px' }}
+                        onMouseEnter={e => e.currentTarget.style.color = 'var(--high)'}
+                        onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}>
+                        <Trash2 size={13} />
+                      </button>
                     </div>
                   )
               ))}
+              {batchResults.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '32px', color: 'var(--text-muted)', fontSize: '13px' }}>
+                  Todos os emails foram removidos.
+                </div>
+              )}
             </div>
           )}
 
@@ -645,17 +683,6 @@ export default function MainApp({ user, onLogout }) {
             <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Modos</div>
             {[['Texto livre', 'var(--text-muted)'], ['Arquivo único', 'var(--text-muted)'], ['Múltiplos (20x)', 'var(--accent-blue)'], ['Gmail (10x)', 'var(--productive)']].map(([t, c], i) => (
               <div key={i} style={{ fontSize: '10px', color: c, fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
-                <span style={{ color: 'var(--text-faint)' }}>▸ </span>{t}
-              </div>
-            ))}
-          </div>
-
-          <div style={{ height: '1px', background: 'var(--border-subtle)' }} />
-
-          <div>
-            <div style={{ fontSize: '9px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Stack</div>
-            {['FastAPI · Python', 'Claude claude-opus-4-5', 'NLTK · RSLP', 'React · Vite', 'Gmail IMAP'].map((t, i) => (
-              <div key={i} style={{ fontSize: '10px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)', marginBottom: '5px' }}>
                 <span style={{ color: 'var(--text-faint)' }}>▸ </span>{t}
               </div>
             ))}
