@@ -17,8 +17,8 @@ Solução de triagem inteligente de emails corporativos com classificação e ge
 
 ## 🔗 Links
 
-- **App Online:** `[URL do deploy — preencher após deploy]`
-- **Repositório:** `[URL do GitHub — preencher após push]`
+- **App Online:** `https://email-classifier-flame.vercel.app`
+- **Repositório:** `https://github.com/yamatadev/email-classifier`
 
 ---
 
@@ -221,8 +221,8 @@ Intelligent corporate email triage solution with AI-powered classification and a
 
 ## 🔗 Links
 
-- **Live App:** `[deploy URL — fill after deploy]`
-- **Repository:** `[GitHub URL — fill after push]`
+- **Live App:** `https://email-classifier-flame.vercel.app`
+- **Repository:** `https://github.com/yamatadev/email-classifier`
 
 ---
 
