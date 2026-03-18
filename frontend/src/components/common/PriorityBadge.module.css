@@ -1,0 +1,28 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+}
+
+.badge.high {
+  color: var(--high);
+  background: color-mix(in srgb, var(--high) 9.4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--high) 18.8%, transparent);
+}
+
+.badge.medium {
+  color: var(--medium);
+  background: color-mix(in srgb, var(--medium) 9.4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--medium) 18.8%, transparent);
+}
+
+.badge.low {
+  color: var(--low);
+  background: color-mix(in srgb, var(--low) 9.4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--low) 18.8%, transparent);
+}

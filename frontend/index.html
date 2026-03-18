@@ -7,7 +7,13 @@
     <title>MailSense — Email Classifier</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Outfit:wght@300;400;500;600&display=swap&subset=latin,latin-ext" rel="stylesheet" />
+    <style>
+      /* Prevent FOIT (Flash of Invisible Text) */
+      @font-face { font-family: 'Syne'; font-display: swap; }
+      @font-face { font-family: 'DM Mono'; font-display: swap; }
+      @font-face { font-family: 'Outfit'; font-display: swap; }
+    </style>
   </head>
   <body>
     <div id="root"></div>

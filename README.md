@@ -13,7 +13,7 @@
 
 # 🇧🇷 Português
 
-Solução de triagem inteligente de emails corporativos com classificação e geração de respostas automáticas via IA (Claude claude-opus-4-5), pipeline NLP em Python, integração nativa com Gmail, sistema de autenticação e interface web premium.
+Solução de triagem inteligente de emails corporativos com classificação e geração de respostas automáticas via IA (Claude Haiku), pipeline NLP em Python, integração nativa com Gmail, sistema de autenticação e interface web premium.
 
 ## 🔗 Links
 
@@ -28,18 +28,30 @@ Solução de triagem inteligente de emails corporativos com classificação e ge
 email-classifier/
 ├── README.md
 ├── backend/
-│   ├── main.py              # API FastAPI — endpoints, NLP, integração Claude e Gmail
-│   ├── requirements.txt     # Dependências Python
-│   ├── render.yaml          # Configuração deploy Render
-│   └── .env.example         # Variáveis de ambiente necessárias
+│   ├── main.py              # Thin entry point (uvicorn main:app)
+│   ├── app/
+│   │   ├── main.py          # App factory, middleware stack
+│   │   ├── config.py        # Centralized settings (env validation)
+│   │   ├── routes/           # analyze, gmail, health endpoints
+│   │   ├── services/         # classifier, nlp, gmail, pdf
+│   │   ├── middleware/        # auth, rate_limit, request_id
+│   │   ├── models/           # Pydantic schemas
+│   │   └── utils/            # cache, logging
+│   ├── requirements.txt
+│   ├── render.yaml
+│   └── .env.example
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx          # Roteador de autenticação
-│   │   ├── index.css        # Design system (variáveis, animações)
-│   │   ├── main.jsx         # Entry point React
+│   │   ├── App.jsx           # Router + ErrorBoundary + AppProvider
+│   │   ├── context/          # AppContext (state management)
+│   │   ├── hooks/            # useAnalysis (API calls)
+│   │   ├── i18n.js           # PT-BR / EN-US translations
 │   │   └── components/
-│   │       ├── LoginPage.jsx  # Tela de login com split layout animado
-│   │       └── MainApp.jsx    # App principal com todos os modos de análise
+│   │       ├── LoginPage.jsx
+│   │       ├── MainApp.jsx
+│   │       ├── layout/        # Header, Sidebar, RightPanel
+│   │       ├── analysis/      # ResultCard, BatchSummary, GmailTab
+│   │       └── common/        # Badge, ConfidenceBar, UploadZone, etc.
 │   ├── index.html
 │   ├── package.json
 │   ├── vite.config.js
@@ -128,7 +140,7 @@ Configure a variável: `VITE_API_URL` = URL do backend no Render
 
 ### Integração com Claude (Anthropic)
 
-O núcleo de inteligência do MailSense é a API Claude claude-opus-4-5 da Anthropic. Após o pré-processamento NLP, o texto do email é enviado ao modelo com um system prompt estruturado que define os critérios de classificação para o contexto financeiro corporativo.
+O núcleo de inteligência do MailSense é a API Claude Haiku da Anthropic. Após o pré-processamento NLP, o texto do email é enviado ao modelo com um system prompt estruturado que define os critérios de classificação para o contexto financeiro corporativo.
 
 O modelo retorna um JSON com:
 - `classification` — PRODUTIVO ou IMPRODUTIVO
@@ -160,7 +172,7 @@ Remoção de stopwords PT + EN (NLTK)
     ↓
 Stemming com algoritmo RSLP (específico para português)
     ↓
-Texto processado + original → Claude claude-opus-4-5
+Texto processado + original → Claude Haiku
     ↓
 JSON estruturado com classificação, confiança, resposta
 ```
@@ -193,7 +205,7 @@ JSON estruturado com classificação, confiança, resposta
 | Backend | FastAPI | 0.115+ |
 | NLP | NLTK + RSLP Stemmer | 3.9+ |
 | PDF | pypdf | 4.3+ |
-| AI | Anthropic Claude claude-opus-4-5 | API |
+| AI | Anthropic Claude Haiku | API |
 | Email (IMAP) | imaplib (stdlib Python) | — |
 | Frontend | React + Vite | 18 + 5 |
 | Deploy Backend | Render | Free tier |
@@ -217,7 +229,7 @@ JSON estruturado com classificação, confiança, resposta
 
 # 🇺🇸 English
 
-Intelligent corporate email triage solution with AI-powered classification and automatic response generation (Claude claude-opus-4-5), Python NLP pipeline, native Gmail integration, authentication system, and premium web interface.
+Intelligent corporate email triage solution with AI-powered classification and automatic response generation (Claude Haiku), Python NLP pipeline, native Gmail integration, authentication system, and premium web interface.
 
 ## 🔗 Links
 
@@ -232,18 +244,30 @@ Intelligent corporate email triage solution with AI-powered classification and a
 email-classifier/
 ├── README.md
 ├── backend/
-│   ├── main.py              # FastAPI — endpoints, NLP, Claude & Gmail integration
-│   ├── requirements.txt     # Python dependencies
-│   ├── render.yaml          # Render deploy config
-│   └── .env.example         # Required environment variables
+│   ├── main.py              # Thin entry point (uvicorn main:app)
+│   ├── app/
+│   │   ├── main.py          # App factory, middleware stack
+│   │   ├── config.py        # Centralized settings (env validation)
+│   │   ├── routes/           # analyze, gmail, health endpoints
+│   │   ├── services/         # classifier, nlp, gmail, pdf
+│   │   ├── middleware/        # auth, rate_limit, request_id
+│   │   ├── models/           # Pydantic schemas
+│   │   └── utils/            # cache, logging
+│   ├── requirements.txt
+│   ├── render.yaml
+│   └── .env.example
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx          # Auth router
-│   │   ├── index.css        # Design system (variables, animations)
-│   │   ├── main.jsx         # React entry point
+│   │   ├── App.jsx           # Router + ErrorBoundary + AppProvider
+│   │   ├── context/          # AppContext (state management)
+│   │   ├── hooks/            # useAnalysis (API calls)
+│   │   ├── i18n.js           # PT-BR / EN-US translations
 │   │   └── components/
-│   │       ├── LoginPage.jsx  # Login screen with animated split layout
-│   │       └── MainApp.jsx    # Main classifier app with all analysis modes
+│   │       ├── LoginPage.jsx
+│   │       ├── MainApp.jsx
+│   │       ├── layout/        # Header, Sidebar, RightPanel
+│   │       ├── analysis/      # ResultCard, BatchSummary, GmailTab
+│   │       └── common/        # Badge, ConfidenceBar, UploadZone, etc.
 │   ├── index.html
 │   ├── package.json
 │   ├── vite.config.js
@@ -332,7 +356,7 @@ Set the environment variable: `VITE_API_URL` = your Render backend URL
 
 ### Claude (Anthropic) Integration
 
-The intelligence core of MailSense is Anthropic's Claude claude-opus-4-5 API. After NLP preprocessing, the email text is sent to the model with a structured system prompt defining classification criteria for the corporate financial context.
+The intelligence core of MailSense is Anthropic's Claude Haiku API. After NLP preprocessing, the email text is sent to the model with a structured system prompt defining classification criteria for the corporate financial context.
 
 The model returns a structured JSON with:
 - `classification` — PRODUCTIVE or UNPRODUCTIVE
@@ -370,7 +394,7 @@ Stopword removal PT + EN (NLTK)
     ↓
 Stemming with RSLP algorithm (Portuguese-specific)
     ↓
-Processed + original text → Claude claude-opus-4-5
+Processed + original text → Claude Haiku
     ↓
 Structured JSON: classification, confidence, response
 ```
@@ -405,7 +429,7 @@ The RSLP algorithm (Portuguese Suffix Stripping) was developed specifically for 
 | Backend | FastAPI | 0.115+ |
 | NLP | NLTK + RSLP Stemmer | 3.9+ |
 | PDF | pypdf | 4.3+ |
-| AI | Anthropic Claude claude-opus-4-5 | API |
+| AI | Anthropic Claude Haiku | API |
 | Email (IMAP) | imaplib (Python stdlib) | — |
 | Frontend | React + Vite | 18 + 5 |
 | Backend Deploy | Render | Free tier |

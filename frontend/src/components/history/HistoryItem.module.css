@@ -1,0 +1,120 @@
+/* HistoryItem.module.css */
+
+.wrapper {
+  position: relative;
+}
+
+.wrapper:hover .deleteBtn {
+  opacity: 1;
+}
+
+.button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  padding-right: 26px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.button:hover {
+  background: var(--bg-hover);
+}
+
+.buttonActive {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+}
+
+.buttonActive:hover {
+  background: var(--bg-elevated);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.topRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.classLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.topRowRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.priorityLabel {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.confidence {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.itemLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.timestamp {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+/* ─── Delete button (hover-reveal) ───────────────────────────────────────── */
+
+.deleteBtn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+}
+
+.deleteBtn:hover {
+  color: var(--high);
+}

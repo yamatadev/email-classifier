@@ -1,0 +1,212 @@
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border-subtle);
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.sidebarHeader {
+  padding: 4px 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sidebarTitle {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Empty state */
+.emptyHistory {
+  text-align: center;
+  padding: 28px 10px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+/* Group labels */
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 4px;
+  margin-top: 6px;
+}
+
+.groupDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.groupText {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex: 1;
+}
+
+.groupCount {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+/* History item wrapper */
+.historyItemWrapper {
+  position: relative;
+}
+
+.historyItemWrapper:hover .deleteBtn {
+  opacity: 1;
+}
+
+/* History button */
+.historyBtn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  padding-right: 26px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.historyBtn:hover {
+  background: var(--bg-hover);
+}
+
+.historyBtnActive {
+  background: var(--bg-elevated);
+  border-color: var(--border-default);
+}
+
+.historyBtnActive:hover {
+  background: var(--bg-elevated);
+}
+
+/* History item content */
+.historyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.historyLeft {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.historyDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.historyType {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.historyMeta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.historyPriority {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.historyConf {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.historyLabel {
+  font-size: 10px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.historyTime {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+/* Delete button */
+.deleteBtn {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+  border-radius: var(--radius-sm);
+}
+
+.deleteBtn:hover {
+  color: var(--high);
+}
+
+/* Responsive: below 768px stack sidebar below main content */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-top: 1px solid var(--border-subtle);
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 10px;
+    order: 1;
+  }
+
+  .sidebarHeader {
+    width: 100%;
+    padding: 0 8px 6px;
+  }
+
+  .groupLabel {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .historyItemWrapper {
+    min-width: 180px;
+    flex-shrink: 0;
+  }
+}

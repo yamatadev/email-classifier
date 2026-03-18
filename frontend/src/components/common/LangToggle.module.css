@@ -1,0 +1,119 @@
+/* ─── Compact variant (header) ───────────────────────────── */
+
+.compactButton {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.compactButton:hover {
+  border-color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.compactButton:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.compactCurrent {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.compactArrow {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.compactTarget {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  letter-spacing: 0.06em;
+}
+
+/* ─── Full variant (login page) ──────────────────────────── */
+
+.fullWrapper {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+}
+
+.fullButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+.fullButton:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+  transform: translateY(-1px);
+}
+
+.fullButton:focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+.langGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.flag {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.fullCurrentLabel {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  letter-spacing: 0.06em;
+}
+
+.fullTargetLabel {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.divider {
+  width: 1px;
+  height: 14px;
+  background: var(--border-subtle);
+}
+
+.hint {
+  text-align: center;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}

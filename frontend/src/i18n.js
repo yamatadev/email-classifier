@@ -13,9 +13,9 @@ export const translations = {
         'Histórico e métricas por sessão',
       ],
       stats: [
-        { value: '150k+', label: 'Pessoas impactadas' },
-        { value: 'US$10M+', label: 'Em ganhos gerados' },
-        { value: '15+', label: 'Países atendidos' },
+        { value: '150k+', label: 'Pessoas impactadas (demo)' },
+        { value: 'US$10M+', label: 'Em ganhos gerados (demo)' },
+        { value: '15+', label: 'Países atendidos (demo)' },
       ],
       welcomeBack: 'Bem-vindo de volta',
       accessAccount: 'Acesse sua conta para continuar',
@@ -29,8 +29,6 @@ export const translations = {
       errorInvalid: 'Email ou senha incorretos. Tente: demo@autou.com.br / autou2025',
       verifying: 'Verificando...',
       enter: 'Entrar',
-      footer: 'MailSense · YamataDev © 2025',
-      langButton: '🇺🇸 Switch to English',
       langHint: 'Clique para mudar o idioma',
       roles: {
         'financial_analyst': 'Analista Financeiro',
@@ -71,6 +69,7 @@ export const translations = {
       analyzeBatch: 'Analisar',
       analyzing: 'Analisando...',
       files: 'arquivo(s)',
+      batchFiles: 'arquivos',
     },
 
     // Gmail Tab
@@ -150,6 +149,16 @@ export const translations = {
       modesList: ['Texto livre', 'Arquivo único', 'Múltiplos (20x)', 'Gmail (10x)'],
       stack: 'Stack',
     },
+
+    // Progress messages (Q8.2)
+    progress: {
+      preparing: 'Preparando análise...',
+      processing: 'Processando email {current} de {total}...',
+      finishing: 'Finalizando resultados...',
+      connecting: 'Conectando ao Gmail...',
+      fetching: 'Buscando emails...',
+      classifying: 'Classificando com IA...',
+    },
   },
 
   'en-US': {
@@ -166,9 +175,9 @@ export const translations = {
         'Session history and metrics',
       ],
       stats: [
-        { value: '150k+', label: 'People impacted' },
-        { value: 'US$10M+', label: 'In gains generated' },
-        { value: '15+', label: 'Countries served' },
+        { value: '150k+', label: 'People impacted (demo)' },
+        { value: 'US$10M+', label: 'In gains generated (demo)' },
+        { value: '15+', label: 'Countries served (demo)' },
       ],
       welcomeBack: 'Welcome back',
       accessAccount: 'Sign in to your account to continue',
@@ -182,8 +191,6 @@ export const translations = {
       errorInvalid: 'Invalid email or password. Try: demo@autou.com.br / autou2025',
       verifying: 'Verifying...',
       enter: 'Sign In',
-      footer: 'MailSense · YamataDev © 2025',
-      langButton: '🇧🇷 Mudar para Português',
       langHint: 'Click to change language',
       roles: {
         'financial_analyst': 'Financial Analyst',
@@ -224,6 +231,7 @@ export const translations = {
       analyzeBatch: 'Analyze',
       analyzing: 'Analyzing...',
       files: 'file(s)',
+      batchFiles: 'files',
     },
 
     // Gmail Tab
@@ -302,6 +310,16 @@ export const translations = {
       modes: 'Modes',
       modesList: ['Free text', 'Single file', 'Multiple (20x)', 'Gmail (10x)'],
       stack: 'Stack',
+    },
+
+    // Progress messages (Q8.2)
+    progress: {
+      preparing: 'Preparing analysis...',
+      processing: 'Processing email {current} of {total}...',
+      finishing: 'Finishing results...',
+      connecting: 'Connecting to Gmail...',
+      fetching: 'Fetching emails...',
+      classifying: 'Classifying with AI...',
     },
   },
 }

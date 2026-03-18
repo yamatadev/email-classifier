@@ -1,0 +1,39 @@
+/* GroupedHistory.module.css */
+
+.empty {
+  text-align: center;
+  padding: 28px 10px;
+  color: var(--text-faint);
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.groupLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 4px;
+  margin-top: 6px;
+}
+
+.groupDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.groupName {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  flex: 1;
+}
+
+.groupCount {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}

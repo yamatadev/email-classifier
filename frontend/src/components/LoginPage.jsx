@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Zap, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle, Globe } from 'lucide-react'
+import { Zap, Mail, Lock, ArrowRight, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { translations } from '../i18n'
+import LangToggleShared from './common/LangToggle'
 
 const DEMO_USERS = [
   { email: 'demo@autou.com.br', password: 'autou2025', name: 'Demo User', roleKey: 'financial_analyst' },
@@ -241,8 +242,14 @@ export default function LoginPage({ onLogin, lang, setLang }) {
     setLoading(true); setError('')
     await new Promise(r => setTimeout(r, 900))
     const user = DEMO_USERS.find(u => u.email === email && u.password === password)
-    if (user) { onLogin({ ...user, lang }) }
-    else { setError(t.errorInvalid); setLoading(false) }
+    if (user) {
+      const key = import.meta.env.VITE_API_KEY || 'mailsense-dev-key-change-in-production'
+      localStorage.setItem('mailsense_api_key', key)
+      onLogin({ ...user, lang })
+    } else {
+      setError(t.errorInvalid)
+      setLoading(false)
+    }
   }
 
   const handleKeyDown = e => { if (e.key === 'Enter') handleSubmit() }
@@ -271,7 +278,9 @@ export default function LoginPage({ onLogin, lang, setLang }) {
       }}>
 
         {/* Language Toggle — prominent, top right */}
-        <LangToggle lang={lang} setLang={setLang} />
+        <div style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 10 }}>
+          <LangToggleShared lang={lang} setLang={setLang} variant="full" />
+        </div>
 
         <div className="auth-enter">
           {/* Header */}
@@ -374,7 +383,7 @@ export default function LoginPage({ onLogin, lang, setLang }) {
           </button>
 
           <p style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-faint)', fontFamily: 'var(--font-mono)', marginTop: '28px' }}>
-            {t.footer}
+            MailSense · YamataDev &copy; {new Date().getFullYear()}
           </p>
         </div>
       </div>

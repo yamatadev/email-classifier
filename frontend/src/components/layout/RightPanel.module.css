@@ -1,0 +1,123 @@
+.panel {
+  width: 200px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border-subtle);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sectionLabel {
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.categoryItem {
+  margin-bottom: 10px;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.categoryDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.categoryLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.categoryDesc {
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-left: 12px;
+  line-height: 1.5;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.pipelineStep {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.stepNum {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+  min-width: 12px;
+}
+
+.stepText {
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.modeItem {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 5px;
+}
+
+.modeBlue { color: var(--accent-blue); }
+.modeGreen { color: var(--productive); }
+
+.modeArrow {
+  color: var(--text-faint);
+}
+
+.stackItem {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  margin-bottom: 5px;
+}
+
+.footer {
+  margin-top: auto;
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  text-align: center;
+  padding-top: 12px;
+}
+
+@media (max-width: 1024px) {
+  .panel {
+    display: none;
+  }
+}
